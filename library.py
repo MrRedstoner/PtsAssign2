@@ -1,3 +1,4 @@
+from __future__ import annotations
 from itertools import count
 
 
@@ -14,21 +15,21 @@ class Reservation(object):
         print(F'Created a reservation with id {self._id} of {self._book} ' +
               F'from {self._from} to {self._to} for {self._for}.')
 
-    def overlapping(self, other):
+    def overlapping(self, other: Reservation):
         ret = (self._book == other._book and self._to >= other._from
                and self._to >= other._from)
-        str = 'do'
+        _str = 'do'
         if not ret:
-            str = 'do not'
-        print(F'Reservations {self._id} and {other._id} {str} overlap')
+            _str = 'do not'
+        print(F'Reservations {self._id} and {other._id} {_str} overlap')
         return ret
 
     def includes(self, date):
         ret = (self._from <= date <= self._to)
-        str = 'includes'
+        _str = 'includes'
         if not ret:
-            str = 'does not include'
-        print(F'Reservation {self._id} {str} {date}')
+            _str = 'does not include'
+        print(F'Reservation {self._id} {_str} {date}')
         return ret
 
     def identify(self, date, book, for_):
@@ -67,7 +68,7 @@ class Library(object):
 
     def add_book(self, name):
         self._books[name] = self._books.get(name, 0) + 1
-        print(F'Book {name} added. We have {self._books[name]} coppies of the book.')
+        print(F'Book {name} added. We have {self._books[name]} copies of the book.')
 
     def reserve_book(self, user, book, date_from, date_to):
         book_count = self._books.get(book, 0)
@@ -101,10 +102,10 @@ class Library(object):
 
     def check_reservation(self, user, book, date):
         res = any([res.identify(date, book, user) for res in self._reservations])
-        str = 'exists'
+        _str = 'exists'
         if not res:
-            str = 'does not exist'
-        print(F'Reservation for {user} of {book} on {date} {str}.')
+            _str = 'does not exist'
+        print(F'Reservation for {user} of {book} on {date} {_str}.')
         return res
 
     def change_reservation(self, user, book, date, new_user):
