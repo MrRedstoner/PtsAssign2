@@ -118,7 +118,7 @@ class Reservation(object):
 
     def overlapping(self, other: Reservation):
         ret = (self._book == other._book and self._to >= other._from
-               and self._to >= other._from)
+               and self._from <= other._to)
         if ret:
             logging.debug(Reservation._string_builder.reservation_overlap(self._id, other._id))
         else:
