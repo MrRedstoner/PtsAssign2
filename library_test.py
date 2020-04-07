@@ -20,13 +20,25 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(res1.overlapping(res0))
 
         res2 = Reservation(11,30,"book0","user1")
-        # overlapping only if same book
         self.assertFalse(res0.overlapping(res2))
         self.assertFalse(res2.overlapping(res0))
 
         res3 = Reservation(5, 15, "book0", "user1")
         self.assertTrue(res0.overlapping(res3))
         self.assertTrue(res3.overlapping(res0))
+
+        # check identification cases
+        self.assertTrue(res0.identify(5,"book0","user0"))
+        self.assertFalse(res0.identify(-1, "book0", "user0"))
+        self.assertFalse(res0.identify(11, "book0", "user0"))
+        self.assertFalse(res0.identify(5, "book1", "user0"))
+        self.assertFalse(res0.identify(5, "book0", "user1"))
+
+        # check user changing
+        self.assertTrue(res0.identify(5,"book0","user0"))
+        res0.change_for("user1")
+        self.assertTrue(res0.identify(5,"book0","user1"))
+        self.assertFalse(res0.identify(5,"book0","user0"))
 
 
 if __name__ == '__main__':

@@ -29,7 +29,7 @@ class StringBuilder:
         return F'Reservation {reservation_id} reserves {book} not {other_book}.'
 
     @staticmethod
-    def wrong_time(reservation_id: int, for_: int, other_for: int) -> str:
+    def wrong_for(reservation_id: int, for_: int, other_for: int) -> str:
         return F'Reservation {reservation_id} is for {for_} not {other_for}.'
 
     @staticmethod
