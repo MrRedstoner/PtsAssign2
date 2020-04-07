@@ -1,9 +1,110 @@
 from __future__ import annotations
 from itertools import count
+import logging
+
+
+class StringBuilder:
+    @staticmethod
+    def create_reservation(reservation_id: int, book: str, from_: str, to: str, for_: str) -> str:
+        return F'Created a reservation with id {reservation_id} of {book} from {from_} to {to} for {for_}.'
+
+    @staticmethod
+    def reservation_overlap(r0_id: int, r1_id: int) -> str:
+        return F'Reservations {r0_id} and {r1_id} do overlap'
+
+    @staticmethod
+    def reservation_no_overlap(r0_id: int, r1_id: int) -> str:
+        return F'Reservations {r0_id} and {r1_id} do not overlap'
+
+    @staticmethod
+    def reservation_includes(reservation_id: int, date: int) -> str:
+        return F'Reservation {reservation_id} includes {date}'
+
+    @staticmethod
+    def reservation_no_include(reservation_id: int, date: int) -> str:
+        return F'Reservation {reservation_id} does not include {date}'
+
+    @staticmethod
+    def wrong_book(reservation_id: int, book: str, other_book: str) -> str:
+        return F'Reservation {reservation_id} reserves {book} not {other_book}.'
+
+    @staticmethod
+    def wrong_time(reservation_id: int, for_: int, other_for: int) -> str:
+        return F'Reservation {reservation_id} is for {for_} not {other_for}.'
+
+    @staticmethod
+    def date_outside_range(reservation_id: int, from_: int, to: int, date: int) -> str:
+        return F'Reservation {reservation_id} is from {from_} to {to} which does not include {date}.'
+
+    @staticmethod
+    def reservation_is_valid(reservation_id: int, for_: int, book: str, date: int) -> str:
+        return F'Reservation {reservation_id} is valid {for_} of {book} on {date}.'
+
+    @staticmethod
+    def reservation_changed(reservation_id: int, for_: int, new_for: int) -> str:
+        return F'Reservation {reservation_id} moved from {for_} to {new_for}'
+
+    @staticmethod
+    def library_created() -> str:
+        return 'Library created.'
+
+    @staticmethod
+    def user_already_exists(name: str) -> str:
+        return F'User not created, user with name {name} already exists.'
+
+    @staticmethod
+    def user_created(name: str) -> str:
+        return F'User {name} created.'
+
+    @staticmethod
+    def book_added(name: str, number: int) -> str:
+        return F'Book {name} added. We have {number} copies of the book.'
+
+    @staticmethod
+    def missing_user(book: str, name: str, from_: int, to: int) -> str:
+        return F'We cannot reserve book {book} for {name} from {from_} to {to}. User does not exist.'
+
+    @staticmethod
+    def missing_book(book: str, name: str, from_: int, to: int) -> str:
+        return F'We cannot reserve book {book} for {name} from {from_} to {to}. We do not have that book.'
+
+    @staticmethod
+    def wrong_dates(book: str, name: str, from_: int, to: int) -> str:
+        return F'We cannot reserve book {book} for {name} from {from_} to {to}. Incorrect dates.'
+
+    @staticmethod
+    def not_enough_books(book: str, name: str, from_: int, to: int) -> str:
+        return F'We cannot reserve book {book} for {name} from {from_} to {to}. We do not have enough books.'
+
+    @staticmethod
+    def reservation_included(reservation_id: int) -> str:
+        return F'Reservation {reservation_id} included.'
+
+    @staticmethod
+    def user_reservation_exists(name: str, book: str, date: int) -> str:
+        return F'Reservation for {name} of {book} on {date} exists.'
+
+    @staticmethod
+    def user_reservation_no_exist(name: str, book: str, date: int) -> str:
+        return F'Reservation for {name} of {book} on {date} does not exist.'
+
+    @staticmethod
+    def reservation_user_does_not_exist(name: str) -> str:
+        return F'Cannot change the reservation as {name} does not exist.'
+
+    @staticmethod
+    def reservation_changed_user(user_from: str, new_user: str, book: str, date: int):
+        return F'Reservation for {user_from} of {book} on {date} changed to {new_user}.'
+
+
+def get_string_builder():
+    return StringBuilder()
 
 
 class Reservation(object):
     _ids = count(0)
+
+    _string_builder = get_string_builder()
 
     def __init__(self, from_, to, book, for_):
         self._id = next(Reservation._ids)
@@ -12,77 +113,75 @@ class Reservation(object):
         self._book = book
         self._for = for_
         self._changes = 0
-        print(F'Created a reservation with id {self._id} of {self._book} ' +
-              F'from {self._from} to {self._to} for {self._for}.')
+        logging.info(Reservation._string_builder.
+                     create_reservation(self._id, self._book, self._from, self._to, self._for))
 
     def overlapping(self, other: Reservation):
         ret = (self._book == other._book and self._to >= other._from
                and self._to >= other._from)
-        _str = 'do'
-        if not ret:
-            _str = 'do not'
-        print(F'Reservations {self._id} and {other._id} {_str} overlap')
+        if ret:
+            logging.debug(Reservation._string_builder.reservation_overlap(self._id, other._id))
+        else:
+            logging.debug(Reservation._string_builder.reservation_no_overlap(self._id, other._id))
         return ret
 
     def includes(self, date):
         ret = (self._from <= date <= self._to)
-        _str = 'includes'
-        if not ret:
-            _str = 'does not include'
-        print(F'Reservation {self._id} {_str} {date}')
+        if ret:
+            logging.debug(Reservation._string_builder.reservation_includes(self._id, date))
+        else:
+            logging.debug(Reservation._string_builder.reservation_no_include(self._id, date))
         return ret
 
     def identify(self, date, book, for_):
         if book != self._book:
-            print(F'Reservation {self._id} reserves {self._book} not {book}.')
+            logging.debug(Reservation._string_builder.wrong_book(self._id, self._book, book))
             return False
         if for_ != self._for:
-            print(F'Reservation {self._id} is for {self._for} not {for_}.')
+            logging.debug(Reservation._string_builder.wrong_for(self._id, self._for, for_))
             return False
         if not self.includes(date):
-            print(F'Reservation {self._id} is from {self._from} to {self._to} which ' +
-                  F'does not include {date}.')
+            logging.debug(Reservation._string_builder.date_outside_range(self._id, self._from, self._to, date))
             return False
-        print(F'Reservation {self._id} is valid {for_} of {book} on {date}.')
+        logging.debug(Reservation._string_builder.reservation_is_valid(self._id, for_, book, date))
         return True
 
     def change_for(self, for_):
-        print(F'Reservation {self._id} moved from {self._for} to {for_}')
+        logging.info(Reservation._string_builder.reservation_changed(self._id, self._for, for_))
         self._for = for_
 
 
 class Library(object):
+    _string_builder = get_string_builder()
+
     def __init__(self):
         self._users = set()
         self._books = {}  # maps name to count
         self._reservations = []  # Reservations sorted by from
-        print(F'Library created.')
+        logging.info(Library._string_builder.library_created())
 
     def add_user(self, name):
         if name in self._users:
-            print(F'User not created, user with name {name} already exists.')
+            logging.warning(Library._string_builder.user_already_exists(name))
             return False
         self._users.add(name)
-        print(F'User {name} created.')
+        logging.info(Library._string_builder.user_created(name))
         return True
 
     def add_book(self, name):
         self._books[name] = self._books.get(name, 0) + 1
-        print(F'Book {name} added. We have {self._books[name]} copies of the book.')
+        logging.info(Library._string_builder.book_added(name, self._books[name]))
 
     def reserve_book(self, user, book, date_from, date_to):
         book_count = self._books.get(book, 0)
         if user not in self._users:
-            print(F'We cannot reserve book {book} for {user} from {date_from} to {date_to}. ' +
-                  F'User does not exist.')
+            logging.warning(Library._string_builder.missing_user(book, user, date_from, date_to))
             return False
         if date_from > date_to:
-            print(F'We cannot reserve book {book} for {user} from {date_from} to {date_to}. ' +
-                  F'Incorrect dates.')
+            logging.warning(Library._string_builder.wrong_dates(book, user, date_from, date_to))
             return False
         if book_count == 0:
-            print(F'We cannot reserve book {book} for {user} from {date_from} to {date_to}. ' +
-                  F'We do not have that book.')
+            logging.warning(Library._string_builder.missing_book(book, user, date_from, date_to))
             return False
         desired_reservation = Reservation(date_from, date_to, book, user)
         relevant_reservations = [res for res in self._reservations
@@ -92,32 +191,31 @@ class Library(object):
         for from_ in [res._from for res in relevant_reservations]:
             if desired_reservation.includes(from_):
                 if sum([rec.includes(from_) for rec in relevant_reservations]) > book_count:
-                    print(F'We cannot reserve book {book} for {user} from {date_from} ' +
-                          F'to {date_to}. We do not have enough books.')
+                    logging.warning(Library._string_builder.not_enough_books(book, user, date_from, date_to))
                     return False
         self._reservations += [desired_reservation]
         self._reservations.sort(key=lambda x: x._from)  # to lazy to make a getter
-        print(F'Reservation {desired_reservation._id} included.')
+        logging.debug(Library._string_builder.reservation_included(desired_reservation._id))
         return True
 
     def check_reservation(self, user, book, date):
         res = any([res.identify(date, book, user) for res in self._reservations])
-        _str = 'exists'
-        if not res:
-            _str = 'does not exist'
-        print(F'Reservation for {user} of {book} on {date} {_str}.')
+        if res:
+            logging.debug(Library._string_builder.user_reservation_exists(user, book, date))
+        else:
+            logging.debug(Library._string_builder.user_reservation_no_exist(user, book, date))
         return res
 
     def change_reservation(self, user, book, date, new_user):
         relevant_reservations = [res for res in self._reservations
                                  if res.identify(date, book, user)]
         if not relevant_reservations:
-            print(F'Reservation for {user} of {book} on {date} does not exist.')
+            logging.warning(Library._string_builder.user_reservation_no_exist(user, book, date))
             return False
         if new_user not in self._users:
-            print(F'Cannot change the reservation as {new_user} does not exist.')
+            logging.warning(Library._string_builder.reservation_user_does_not_exist(new_user))
             return False
 
-        print(F'Reservation for {user} of {book} on {date} changed to {new_user}.')
+        logging.info(Library._string_builder.reservation_changed_user(user, new_user, book, date))
         relevant_reservations[0].change_for(new_user)
         return True
