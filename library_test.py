@@ -1,5 +1,5 @@
 import unittest
-from library import Reservation, Library
+from library import Reservation, Library, StringBuilder
 
 
 class MyTestCase(unittest.TestCase):
@@ -79,6 +79,16 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(lib.change_reservation("user1", "no book", 5, "user0"))
         self.assertFalse(lib.change_reservation("user1", "book1", 100, "user0"))
         self.assertFalse(lib.change_reservation("user1", "book1", -10, "user0"))
+
+    def test_string_builder(self):
+        sb = StringBuilder()
+        self.assertEqual("Library created.", sb.library_created())
+        self.assertEqual("Reservation 10 included.", sb.reservation_included(10))
+        self.assertEqual("Book ABook added. We have 3 copies of the book.", sb.book_added("ABook", 3))
+        self.assertEqual("Reservation 3 moved from UserA to UserB", sb.reservation_changed(3, "UserA", "UserB"))
+        self.assertEqual("Reservation 5 is from 1 to 2 which does not include 10.", sb.date_outside_range(5, 1, 2, 10))
+        self.assertEqual("Created a reservation with id 5 of ABook from 1 to 10 for UserA.",
+                         sb.create_reservation(5, "ABook", 1, 10, "UserA"))
 
 
 if __name__ == '__main__':
