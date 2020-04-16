@@ -5,7 +5,7 @@ import logging
 
 class StringBuilder:
     @staticmethod
-    def create_reservation(reservation_id: int, book: str, from_: str, to: str, for_: str) -> str:
+    def create_reservation(reservation_id: int, book: str, from_: int, to: int, for_: str) -> str:
         return F'Created a reservation with id {reservation_id} of {book} from {from_} to {to} for {for_}.'
 
     @staticmethod
@@ -41,7 +41,7 @@ class StringBuilder:
         return F'Reservation {reservation_id} is valid {for_} of {book} on {date}.'
 
     @staticmethod
-    def reservation_changed(reservation_id: int, for_: int, new_for: int) -> str:
+    def reservation_changed(reservation_id: int, for_: str, new_for: str) -> str:
         return F'Reservation {reservation_id} moved from {for_} to {new_for}'
 
     @staticmethod
