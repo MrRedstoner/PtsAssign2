@@ -150,6 +150,12 @@ class Reservation(object):
         logging.info(Reservation._string_builder.reservation_changed(self._id, self._for, for_))
         self._for = for_
 
+    def get_from(self):
+        return self._from
+
+    def get_id(self):
+        return self._id
+
 
 class Library(object):
     _string_builder = get_string_builder()
@@ -188,14 +194,14 @@ class Library(object):
                                  if desired_reservation.overlapping(res)] + [desired_reservation]
         # we check that if we add this reservation then for every reservation record that starts
         # between date_from and date_to no more than book_count books are reserved.
-        for from_ in [res._from for res in relevant_reservations]:
+        for from_ in [res.get_from() for res in relevant_reservations]:
             if desired_reservation.includes(from_):
                 if sum([rec.includes(from_) for rec in relevant_reservations]) > book_count:
                     logging.warning(Library._string_builder.not_enough_books(book, user, date_from, date_to))
                     return False
         self._reservations += [desired_reservation]
-        self._reservations.sort(key=lambda x: x._from)  # to lazy to make a getter
-        logging.debug(Library._string_builder.reservation_included(desired_reservation._id))
+        self._reservations.sort(key=lambda x: x.getFrom())  # to lazy to make a getter
+        logging.debug(Library._string_builder.reservation_included(desired_reservation.get_id()))
         return True
 
     def check_reservation(self, user, book, date):
