@@ -42,6 +42,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_library(self):
         lib = Library()
+        # check emptiness
+        self.assertFalse(lib.reserve_book("user","book",1,10))
+        self.assertFalse(lib.check_reservation("user","book",5))
+        self.assertFalse(lib.change_reservation("user","book",5,"new_user"))
+
         # add some users
         self.assertTrue(lib.add_user("user0"))
         self.assertFalse(lib.add_user("user0"))
@@ -51,6 +56,9 @@ class MyTestCase(unittest.TestCase):
         lib.add_book("book0")
         lib.add_book("book1")
         lib.add_book("book2")
+
+        # check while no reservations exist
+        self.assertFalse(lib.change_reservation("user0", "book0", 5, "user1"))
 
         # try basic checkouts
         self.assertFalse(lib.check_reservation("user0", "book0", 5))

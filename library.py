@@ -200,7 +200,7 @@ class Library(object):
                     logging.warning(Library._string_builder.not_enough_books(book, user, date_from, date_to))
                     return False
         self._reservations += [desired_reservation]
-        self._reservations.sort(key=lambda x: x.getFrom())  # to lazy to make a getter
+        self._reservations.sort(key=lambda x: x.get_from())  # to lazy to make a getter
         logging.debug(Library._string_builder.reservation_included(desired_reservation.get_id()))
         return True
 
